@@ -1,47 +1,35 @@
 #include "Storage.h"
-#include <FS.h>
-#include <SD.h>
-#include <SPI.h>
 
-#define SD_CS 5  // Chip select pin — adjust if needed
+#define SD_CS 5  // Adjust if needed
 
 bool initStorage() {
   if (!SD.begin(SD_CS)) {
-    Serial.println("SD Card initialization failed!");
+    Serial.println("SD init failed");
     return false;
   }
-  Serial.println("SD Card initialized.");
+  Serial.println("SD initialized");
   return true;
 }
 
-bool writeLog(const String& filename, const String& data) {
+bool saveToFile(const String& filename, const String& data) {
   File file = SD.open(filename, FILE_WRITE);
-  if (!file) {
-    Serial.println("Failed to open file for writing");
-    return false;
-  }
+  if (!file) return false;
   file.println(data);
   file.close();
   return true;
 }
 
-bool appendLog(const String& filename, const String& data) {
+bool appendToFile(const String& filename, const String& data) {
   File file = SD.open(filename, FILE_APPEND);
-  if (!file) {
-    Serial.println("Failed to open file for appending");
-    return false;
-  }
+  if (!file) return false;
   file.println(data);
   file.close();
   return true;
 }
 
-String readLog(const String& filename) {
+String readFile(const String& filename) {
   File file = SD.open(filename);
-  if (!file) {
-    Serial.println("Failed to open file for reading");
-    return "";
-  }
+  if (!file) return "";
   String content;
   while (file.available()) {
     content += char(file.read());
@@ -51,8 +39,47 @@ String readLog(const String& filename) {
 }
 
 bool deleteFile(const String& filename) {
-  if (SD.exists(filename)) {
-    return SD.remove(filename);
+  return SD.exists(filename) ? SD.remove(filename) : false;
+}
+
+void listFiles(const String& path) {
+  File dir = SD.open(path);
+  if (!dir || !dir.isDirectory()) return;
+
+  File file = dir.openNextFile();
+  while (file) {
+    Serial.println(file.name());
+    file = dir.openNextFile();
   }
-  return false;
+}
+
+bool fileExists(const String& filename) {
+  return SD.exists(filename);
+}
+
+String getFileNameByIndex(int index) {
+  File dir = SD.open("/");
+  if (!dir || !dir.isDirectory()) return "";
+
+  int count = 0;
+  File file = dir.openNextFile();
+  while (file) {
+    if (count == index) return String(file.name());
+    file = dir.openNextFile();
+    count++;
+  }
+  return "";
+}
+
+int getFileCount(const String& path) {
+  File dir = SD.open(path);
+  if (!dir || !dir.isDirectory()) return 0;
+
+  int count = 0;
+  File file = dir.openNextFile();
+  while (file) {
+    count++;
+    file = dir.openNextFile();
+  }
+  return count;
 }
