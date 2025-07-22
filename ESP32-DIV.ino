@@ -16,6 +16,13 @@ TFT_eSPI tft = TFT_eSPI();
 #define pcf_ADDR 0x20
 PCF8574 pcf(pcf_ADDR);
 
+#include "Storage.h"
+
+void setup() {
+  initStorage();
+  writeLog("/scan.txt", "SSID: mynetwork, RSSI: -42");
+}
+
 #define BTN_UP     6
 #define BTN_DOWN   3
 #define BTN_LEFT   4
