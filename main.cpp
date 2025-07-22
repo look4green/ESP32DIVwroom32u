@@ -4,9 +4,17 @@
 #include "Menu.h"
 #include "AppState.h"
 #include "Storage.h"
+#include "Splash.h"
 
 void setup() {
   Serial.begin(115200);
+  initDisplay();
+  showSplashScreen();  // Original-style splash
+  initEncoder();
+  initTouchscreen();
+  initStorage();
+  initMenu();
+  initAppState();
 
   initDisplay();
   initEncoder();
