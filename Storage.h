@@ -2,12 +2,20 @@
 #define STORAGE_H
 
 #include <Arduino.h>
+#include <FS.h>
+#include <SD.h>
 
-// Storage API
+// Core functions
 bool initStorage();
-bool writeLog(const String& filename, const String& data);
-bool appendLog(const String& filename, const String& data);
-String readLog(const String& filename);
+bool saveToFile(const String& filename, const String& data);
+bool appendToFile(const String& filename, const String& data);
+String readFile(const String& filename);
 bool deleteFile(const String& filename);
+void listFiles(const String& path = "/");
+
+// DIV-style helpers
+bool fileExists(const String& filename);
+String getFileNameByIndex(int index);
+int getFileCount(const String& path = "/");
 
 #endif
